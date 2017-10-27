@@ -11,24 +11,26 @@ const Stars = props => {
   // }
   return (
     <div className="col-5">
-    {_range(props.numberOfStars).map(i => <Staricon key={i} className="star" />)}
+    {_range(props.numberOfStars).map(i =>
+      <Staricon key={i} className="star" />)}
     </div>
   )
 }
-
 const Button = props => {
   return (
     <div className="col-2 center-block">
-      <button>=</button>
+      <button className="btn" disabled={props.selectedNumbers.length === 0}>=</button>
     </div>
   )
 }
-
 const Answer = props => {
   return (
     <div className="col-5">
       {props.selectedNumbers.map((number, i) =>
-      <span key={i}>{number}</span>)}
+      <span key={i}
+           onClick={() => props.unselectNumber(number)}>
+        {number}
+      </span>)}
     </div>
   )
 }
@@ -61,36 +63,40 @@ class Game extends Component {
   state={
     selectedNumbers: [],
     randomNumberOfStars: 1 + Math.floor(Math.random()*9)
-
   }
   selectedNumber = (clickedNumber) => {
     if (this.state.selectedNumbers.indexOf(clickedNumber) >=0 ) {
-      return null
+      return
     } // This prevent  the selected Number from being clicked again
-
     this.setState(prevState => ({
       selectedNumbers: prevState.selectedNumbers.concat(clickedNumber)
     }))
   }
-
+  unselectNumber = (clickedNumber) => {
+    this.setState(prevState => ({
+      selectedNumbers:prevState.selectedNumbers
+                               .filter(number => number !== clickedNumber)
+    }))
+  }
   render() {
+    const { selectedNumbers, randomNumberOfStars } = this.state
     return(
       <div className="container">
         <h3>Play Nine</h3>
         <hr />
         <div className="row">
-          <Stars numberOfStars={this.state.randomNumberOfStars}/>
-          <Button />
-          <Answer selectedNumbers={this.state.selectedNumbers} />
+          <Stars numberOfStars={randomNumberOfStars}/>
+          <Button selectedNumbers={selectedNumbers}/>
+          <Answer selectedNumbers={selectedNumbers}
+                  unselectNumber={this.unselectNumber}/>
         </div>
         <br />
-        <Numbers selectedNumbers={this.state.selectedNumbers}
+        <Numbers selectedNumbers={selectedNumbers}
                  selectedNumber={this.selectedNumber} />
       </div>
     )
   }
 }
-
 class App extends Component{
   render() {
     return(
